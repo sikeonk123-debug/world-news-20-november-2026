@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 """Draw entry.png: a one-page newspaper front page summing up 20 Nov 2026.
 
-v2 (20 Nov 2026, ~04:00 UTC): rebuilt to the winning pattern of the
-18 November contest (anahot1, 99.23% provisional): newspaper front page,
-44 stories across 7 regions, 3 hero + 10 secondary original flat
-illustrations, numbers strip, region strip, pinned world map, 31-story
-numbered list, DATE CHECK box, sources footer. Every story was verified
-as having happened, or first been reported, on Friday 20 November 2026
-in at least one outlet; near-misses are named in the DATE CHECK box.
-Counts reconcile: 3 hero + 10 secondary + 31 listed = 44; region counts
-sum to 44. Drawn with Pillow only; no photos, no copied art.
+v3 (21 Nov 2026, 08:00 WIB): final rebuild after the full day ended
+everywhere. 35 stories across 7 regions (EUROPE 8, AMERICAS 9, ASIA 4,
+MIDDLE EAST 4, WORLD 5, AFRICA 3, OCEANIA 2), 3 hero + 10 secondary
+original flat illustrations, numbers strip, pinned dotted world map,
+22-story numbered list, DATE CHECK box with 13 dated exclusions,
+sources footer. Every story was verified as having happened, or first
+been reported, on Friday 20 November 2026; near-misses are named in the
+DATE CHECK box. Counts reconcile: 3 hero + 10 secondary + 22 listed =
+35; region counts sum to 35. Corrections vs v2: Genoa drone shutdown,
+Finland Onkalo licence, the IRGC "four tankers" claim and the Pete Rose
+pardon were all 19 Nov or earlier and are excluded; COP31 did NOT close
+with a deal on 20 Nov (overtime); the Hormuz mine story is Iran's claim
+only. Drawn with Pillow only; no photos, no copied art.
 """
 from PIL import Image, ImageDraw, ImageFont
 import os
@@ -166,13 +170,13 @@ def ill_tanker(d, box):
     d.rectangle([x0, y1 - 34, x1, y1 - 26], fill=(52, 96, 140))
     d.rectangle([x0, y1 - 26, x1, y1], fill=(36, 76, 118))
     wave(d, x0 + 6, y1 - 22, x1 - 6, (220, 235, 242))
-    hx, hy = x0 + 30, y1 - 62
+    hx, hy = x0 + 30, y1 - 48
     d.polygon([(hx, hy + 22), (hx + 150, hy + 22), (hx + 162, hy + 8), (hx, hy + 8)], fill=(24, 24, 28))
     for i, c in enumerate([(200, 60, 50), (40, 120, 90), (220, 160, 40)]):
         d.rectangle([hx + 16 + i * 30, hy - 8, hx + 40 + i * 30, hy + 8], fill=c)
-    d.rectangle([hx + 118, hy - 18, hx + 132, hy + 8], fill=(240, 240, 240))
-    star4(d, hx + 60, hy - 16, 12, (255, 140, 40))
-    cloud(d, hx + 52, hy - 40, 18, (140, 140, 140))
+    d.rectangle([hx + 118, hy - 8, hx + 132, hy + 8], fill=(240, 240, 240))
+    star4(d, hx + 60, hy - 2, 8, (255, 140, 40))
+    cloud(d, hx + 138, y0 + 4, 14, (140, 140, 140))
 
 def ill_lebanon(d, box):
     x0, y0, x1, y1 = box
@@ -273,10 +277,49 @@ def ill_cricket(d, box):
     d.rectangle([x0 + 20, y1 - 56, x0 + 44, y1 - 48], fill=(190, 140, 80))
     d.ellipse([x1 - 42, y0 + 18, x1 - 26, y0 + 34], fill=(200, 40, 40))
 
+def ill_chart(d, box):
+    x0, y0, x1, y1 = box
+    bands(d, box, [(248, 240, 228), (244, 232, 214), (238, 224, 200)])
+    for gy in range(y0 + 14, y1 - 8, 14):
+        d.line([x0 + 6, gy, x1 - 6, gy], fill=(214, 204, 186), width=1)
+    pts = [(x0 + 14, y0 + 18), (x0 + 52, y0 + 26), (x0 + 82, y0 + 22),
+           (x0 + 112, y0 + 40), (x0 + 142, y0 + 48), (x0 + 168, y0 + 66)]
+    for a, b in zip(pts, pts[1:]):
+        d.line([a, b], fill=(178, 34, 34), width=3)
+    for p in pts:
+        d.ellipse([p[0] - 3, p[1] - 3, p[0] + 3, p[1] + 3], fill=(178, 34, 34))
+    d.polygon([(pts[-1][0] - 7, pts[-1][1] - 12), (pts[-1][0] + 7, pts[-1][1] - 12),
+               (pts[-1][0], pts[-1][1] + 2)], fill=(178, 34, 34))
+    d.text((x0 + 12, y1 - 22), "-5%", font=font(SANS_B, 16), fill=(178, 34, 34))
+
+def ill_border(d, box):
+    x0, y0, x1, y1 = box
+    bands(d, box, [(196, 210, 222), (178, 194, 210), (160, 178, 198)])
+    d.rectangle([x0, y1 - 26, x1, y1], fill=(110, 110, 108))
+    d.line([x0 + 8, y1 - 26, x1 - 8, y1 - 26], fill=(240, 240, 240), width=2)
+    for bx in (x0 + 24, x0 + 88, x0 + 150):
+        d.rectangle([bx, y0 + 18, bx + 6, y1 - 26], fill=(70, 74, 80))
+    for i in range(3):
+        yb = y0 + 24 + i * 10
+        d.rectangle([x0 + 24, yb, x0 + 156, yb + 5], fill=(178, 34, 34) if i % 2 == 0 else (240, 240, 240))
+    d.rectangle([x0 + 62, y0 + 8, x0 + 118, y0 + 20], fill=(24, 34, 52))
+    d.text((x0 + 67, y0 + 10), "CLOSED", font=font(SANS_B, 10), fill=(255, 255, 255))
+
+def ill_exchange(d, box):
+    x0, y0, x1, y1 = box
+    bands(d, box, [(38, 48, 78), (48, 62, 98), (62, 78, 118)])
+    d.rectangle([x0 + 52, y1 - 52, x0 + 128, y1 - 12], fill=(210, 208, 200))
+    d.polygon([(x0 + 44, y1 - 52), (x0 + 90, y1 - 74), (x0 + 136, y1 - 52)], fill=(170, 168, 158))
+    for wx in range(x0 + 60, x0 + 122, 14):
+        d.rectangle([wx, y1 - 44, wx + 7, y1 - 30], fill=(255, 214, 90))
+    d.rectangle([x0 + 84, y1 - 26, x0 + 96, y1 - 12], fill=(90, 86, 78))
+    d.line([x1 - 52, y0 + 16, x1 - 30, y0 + 34, x1 - 44, y0 + 52], fill=(255, 90, 80), width=3)
+    d.polygon([(x1 - 44, y0 + 44), (x1 - 44, y0 + 56), (x1 - 32, y0 + 52)], fill=(255, 90, 80))
+
 ILLS = {
-    1: ill_akvan, 2: ill_kyiv, 3: ill_cop31, 4: ill_talks, 5: ill_tanker,
-    6: ill_lebanon, 7: ill_genoa, 8: ill_finland, 9: ill_nvidia, 10: ill_rose,
-    11: ill_gaza, 12: ill_gta, 13: ill_cricket,
+    1: ill_akvan, 2: ill_kyiv, 3: ill_cop31, 4: ill_genoa, 5: ill_tanker,
+    6: ill_nvidia, 7: ill_chart, 8: ill_gta, 9: ill_talks, 10: ill_cricket,
+    11: ill_border, 12: ill_lebanon, 13: ill_exchange,
 }
 
 # ---------- story data ----------
@@ -284,91 +327,82 @@ ILLS = {
 HEROES = [
     (1, "ASIA", "WEATHER", "IMD",
      "Akvan makes landfall in Odisha",
-     "The cyclone crosses near Gopalpur at 70-80 km/h; 300,000 people moved to shelters."),
+     "Crosses near Gopalpur at 70-80 km/h; 372,000 evacuated, no deaths reported."),
     (2, "EUROPE", "UKRAINE WAR", "REUTERS",
-     "Russia fires missiles at Kyiv",
-     "Missiles strike overnight; debris sets fire to a building in Obolonskyi."),
-    (3, "WORLD", "CLIMATE", "AFP",
-     "COP31 draft drops fossil fuels",
-     "The draft is cut from 144 paragraphs to 80, with no fossil fuel named."),
+     "Russia hits Kyiv's bridges",
+     "400+ drones and 110 missiles hit three Dnipro bridges overnight; 8 killed."),
+    (3, "WORLD", "CLIMATE", "REUTERS",
+     "COP31 misses its deadline",
+     "Antalya talks go into overtime; draft drops fossil fuels and $120bn target."),
 ]
 SECONDARY = [
-    (4, "EUROPE", "UKRAINE WAR", "BBC",
-     "Europe open to Russia talks",
-     "EU leaders are ready to negotiate an end to the war."),
-    (5, "MIDDLE EAST", "GULF", "DAILY BAKU",
-     "Tanker ablaze after mine hit",
-     "Tanker catches fire east of Hormuz after hitting a mine."),
-    (6, "MIDDLE EAST", "LEBANON", "DAILY BAKU",
-     "Israel hits Hezbollah site",
-     "Israel strikes a Hezbollah missile site in east Lebanon."),
-    (7, "EUROPE", "ITALY", "DAILY BAKU",
-     "Drones shut Genoa airport",
-     "Drones halt Genoa flights for four hours overnight."),
-    (8, "EUROPE", "ENERGY", "GERMANY EYE",
-     "Finland opens nuclear store",
-     "Finland approves the first store for spent nuclear fuel."),
-    (9, "AMERICAS", "TECH", "BBC",
-     "California probes Nvidia",
-     "California probes Nvidia over AI chips reaching China."),
-    (10, "AMERICAS", "US", "BBC",
-     "Trump pardons Pete Rose",
-     "Trump posthumously pardons baseball great Pete Rose."),
-    (11, "WORLD", "GAZA", "PARIS EYE",
-     "Four nations press on Gaza aid",
-     "Four nations urge Israel to let aid reach flooded Gaza."),
-    (12, "WORLD", "GAMES", "ROCKSTAR",
-     "GTA VI's first day on sale",
-     "Rockstar's hit begins its first full day on sale."),
-    (13, "OCEANIA", "CRICKET", "CAREERINDIA",
-     "Test resumes in Wellington",
-     "New Zealand resume on 243 for five; Nicholls 113*."),
+    (4, "EUROPE", "POLAND", "AP",
+     "Missiles breach Polish air",
+     "Three objects cross in; NATO jets scramble."),
+    (5, "MIDDLE EAST", "GULF", "REUTERS",
+     "Tanker ablaze off Hormuz",
+     "UKMTO: projectile hits tanker; Iran mine claim unverified."),
+    (6, "ASIA", "MARKETS", "REUTERS",
+     "Asia's AI sell-off deepens",
+     "Nikkei -5.1%, Kospi -5.2%, Taiex -6.2% in tech rout."),
+    (7, "AMERICAS", "MARKETS", "AP",
+     "Wall Street plunges",
+     "S&P -3.7%, Nasdaq -5.3%; worst week in 18 months."),
+    (8, "WORLD", "GAMES", "REUTERS",
+     "GTA VI: $3.79bn day one",
+     "Record sales announced; 32.5m copies pre-sold."),
+    (9, "EUROPE", "BREXIT", "REUTERS",
+     "UK-EU seal reset deal",
+     "Food trade, carbon link, youth mobility agreed."),
+    (10, "OCEANIA", "CRICKET", "AP",
+     "Nicholls 175* lifts NZ to 368",
+     "India reply 159/1 on day two; trail by 209."),
+    (11, "EUROPE", "SECURITY", "REUTERS",
+     "Estonia to shut Russia border",
+     "Five crossings close from 1 Dec for six months."),
+    (12, "MIDDLE EAST", "LEBANON", "AP",
+     "Israel strikes Lebanon again",
+     "Artillery and five air strikes hit south and Bekaa."),
+    (13, "AMERICAS", "TECH", "AFP",
+     "Anthropic slides on day two",
+     "Shares fall ~9% after debut; IPO totals $93.5bn."),
 ]
 LISTED = [
-    "Kyiv: Zelensky says US blocks paid missiles",
-    "Paris: France, Germany, UK weigh Russia talks",
-    "Berlin: suspected Russian spy arrested",
-    "Berlin: 2027 tax take to hit 1 trillion euros",
-    "Berlin: states urge tax cuts on energy",
-    "Paris: one dead, 15 hurt in tower fire",
-    "Paris: fourth weekend of cost protests",
-    "Geneva: reefs face extinction in 50 years",
-    "London: F1 to hire full-time stewards",
-    "Bhopal: state scraps two-child rule",
-    "Delhi: Modi opens SCO dialogue forum",
-    "Delhi: Rs 1,976-cr Barak missile deal signed",
-    "Chattogram: fire at Yunus family home",
-    "Delhi: Indian students in US fall 6.5%",
-    "Washington: US details $12bn Venezuela cash",
-    "London: four men convicted over Joanne Young",
-    "Mumbai: state drops court plea vs Centre",
-    "Delhi: Shah puts radical hotspots on watch",
+    "Seoul: 111 caught cheating at Suneung exam",
+    "Seoul: BTS pass 10bn streams in Japan",
     "Worldwide: World Children's Day marked",
-    "Antalya: Africa climate cash row flares",
-    "Geneva: Gukesh to defend chess crown",
-    "Bhubaneswar: railways cancel 10 trains",
-    "Srinagar: Shah says Kashmir free of local militants",
-    "New York: India backs UN Palestine vote",
-    "Muscat: 21 Indian sailors safe after tanker attack",
-    "Bhubaneswar: 1,012 teams ready for Akvan",
-    "Antalya: COP31 talks may run past deadline",
-    "Delhi: Modi hails growth at FICCI meet",
-    "Kyiv: Ukraine strikes Kerch Bridge",
-    "Manama: Iran drones hit Bahrain again",
-    "Doha: Qatar urges restraint in Gulf",
+    "Gaza: 94% urgently need shelter, UNRWA says",
+    "Paris: de Villepin launches 2027 bid",
+    "New York: Rikers Island to close by 2032",
+    "Washington: judge blocks $4bn housing revamp",
+    "Washington: shutdown warning before Christmas",
+    "Worldwide: oil near $93, Bitcoin below $62,000",
+    "Kharg: Iran claims 14-tanker convoy test",
+    "Sydney: marathon champion banned 3 years",
+    "Kyiv: 1,144 children killed or hurt in 2026",
+    "Johannesburg: ex-deputy president dies",
+    "Conakry: Guinea bans Burkina Faso broadcaster",
+    "Brussels: EU approves 1bn-euro arms aid",
+    "London: UK pledges 1,000 drones for Kyiv",
+    "Buenos Aires: Senate backs disability law",
+    "Brasilia: central bank sells $1bn to steady real",
+    "Nairobi: US group wins $60bn rare-earth deal",
+    "Washington: US sanctions Comancheros, 'Ndrangheta",
+    "Washington: Trump threatens data-centre penalties",
+    "Antalya: 20 nations push back on draft",
 ]
-REGIONS = [("EUROPE", 13, (36, 84, 160)), ("AMERICAS", 3, (14, 128, 128)),
-           ("ASIA", 12, (122, 62, 158)), ("AFRICA", 1, (46, 134, 74)),
-           ("MIDDLE EAST", 5, (178, 44, 44)), ("OCEANIA", 1, (214, 122, 26)),
-           ("WORLD", 9, (96, 96, 100))]
-NUMBERS = [("300,000", "evacuated"), ("423", "rescue teams"),
-           ("1,012", "emergency teams"), ("144-80", "draft"),
-           ("$12bn", "Venezuela")]
+REGIONS = [("EUROPE", 8, (36, 84, 160)), ("AMERICAS", 9, (14, 128, 128)),
+           ("ASIA", 4, (122, 62, 158)), ("MIDDLE EAST", 4, (178, 44, 44)),
+           ("WORLD", 5, (96, 96, 100)), ("AFRICA", 3, (46, 134, 74)),
+           ("OCEANIA", 2, (214, 122, 26))]
+NUMBERS = [("372,000", "evacuated"), ("400+", "drones"),
+           ("$3.79bn", "GTA VI"), ("100,000", "youth"),
+           ("1,144", "children"), ("175*", "Nicholls")]
 # map pins: (num, x, y) in map coords; red for 1-3, navy for 4-13
-PINS = [(1, 240, 846), (2, 196, 807), (3, 192, 822), (4, 172, 804),
-        (5, 217, 838), (6, 206, 830), (7, 182, 818), (8, 192, 794),
-        (9, 71, 823), (10, 102, 821), (11, 196, 838), (12, 106, 838),
-        (13, 312, 925)]
+PINS = [(1, 240, 846), (2, 196, 807), (3, 192, 822), (4, 184, 796),
+        (5, 217, 838), (6, 292, 812), (7, 71, 823), (8, 106, 838),
+        (9, 182, 818), (10, 312, 925), (11, 202, 786), (12, 206, 830),
+        (13, 58, 832)]
 LAND = [  # ellipses (x0, y0, x1, y1) forming a coarse dotted world map
     (45, 775, 170, 850), (175, 772, 200, 790), (130, 855, 185, 935),
     (185, 790, 235, 825), (190, 830, 250, 920), (235, 780, 310, 850),
@@ -403,7 +437,7 @@ def main():
     d.text((134, 40), "Friday 20 November 2026", font=font(SERIF_B, 50), fill=INK)
     d.text((134, 100), "Everything on this page happened, or was first reported, on Friday 20 November 2026.",
            font=font(SANS, 15), fill=MUTED)
-    for i, line in enumerate(["44 STORIES", "7 REGIONS", "ONE PAGE"]):
+    for i, line in enumerate(["35 STORIES", "7 REGIONS", "ONE PAGE"]):
         f = font(SANS_B, 19)
         d.text((X1 - d.textlength(line, font=f), 26 + i * 26), line, font=f, fill=INK)
     d.line([M, 144, X1, 144], fill=INK, width=2)
@@ -413,7 +447,7 @@ def main():
     total_w = X1 - M
     widths = []
     for name, n, _ in REGIONS:
-        widths.append(max(64, int(total_w * n / 44)))
+        widths.append(max(64, int(total_w * n / 35)))
     scale = total_w / sum(widths)
     widths = [int(w * scale) for w in widths]
     widths[-1] += total_w - sum(widths)
@@ -440,6 +474,8 @@ def main():
         nx += d.textlength(num + " ", font=f1)
         d.text((nx, y), lab, font=f2, fill=INK)
         nx += d.textlength(lab + "  ·  ", font=f2)
+    if nx > X1:
+        print(f"OVERFLOW: numbers strip ends at {nx}, page edge {X1}")
     d.line([M, 206, X1, 206], fill=RULE, width=1)
 
     # ---- hero stories ----
@@ -473,7 +509,7 @@ def main():
     my = 752
     d.line([M, my - 4, X1, my - 4], fill=INK, width=2)
     d.text((M, my), "WHERE IT HAPPENED", font=font(SANS_B, 14), fill=INK)
-    d.text((330, my), "ALSO ON FRIDAY 20 NOVEMBER — 31 MORE STORIES",
+    d.text((330, my), "ALSO ON FRIDAY 20 NOVEMBER — 22 MORE STORIES",
            font=font(SANS_B, 14), fill=INK)
     # dotted map
     mx0, my0, mx1, my1 = M, my + 24, 318, 946
@@ -492,32 +528,43 @@ def main():
         d.text((px - d.textlength(t, font=f) / 2, py - 5), t, font=f, fill=(255, 255, 255))
     d.text((M, 950), "Red pins: stories 1-3 · dark pins: stories 4-13",
            font=font(SANS, 11), fill=MUTED)
-    # numbered list, two columns
+    # numbered list, two columns of 11
     lf = font(SANS, 11)
     for i, item in enumerate(LISTED):
-        col = i // 16
-        row = i % 16
+        col = i // 11
+        row = i % 11
         lx = 330 + col * 336
-        ly = my + 24 + row * 11
+        ly = my + 24 + row * 12
         num = 14 + i
         d.text((lx, ly), f"{num}", font=font(SANS_B, 11), fill=RED)
         d.text((lx + 22, ly), item, font=lf, fill=INK)
 
     # ---- date check box ----
-    by0 = 966
-    d.rectangle([M, by0, X1, by0 + 34], outline=RED, width=2)
-    d.text((M + 10, by0 + 4), "DATE CHECK", font=font(SANS_B, 12), fill=RED)
-    d.text((M + 108, by0 + 4),
+    by0 = 962
+    d.rectangle([M, by0, X1, by0 + 46], outline=RED, width=2)
+    d.text((M + 10, by0 + 3), "DATE CHECK", font=font(SANS_B, 12), fill=RED)
+    d.text((M + 108, by0 + 3),
            "Left out on purpose — each was first reported before Friday:",
            font=font(SANS, 12), fill=INK)
-    d.text((M + 10, by0 + 19),
-           "ICJ Rohingya verdict (19 Nov) · Trump-Xi-Putin talks (19 Nov) · Anthropic debut (19 Nov) · Houthi Saudi strikes (19 Nov) · Eisenkot mandate (8 Nov)",
-           font=font(SANS, 11), fill=MUTED)
+    d.text((M + 10, by0 + 16),
+           "Trilateral Shenzhen (19 Nov) · ICJ Myanmar ruling (19 Nov) · Houthi PIF Tower hit (19 Nov) · Pete Rose pardon (19 Nov)",
+           font=font(SANS, 9), fill=MUTED)
+    d.text((M + 10, by0 + 26),
+           "Nvidia subpoena (19 Nov) · Genoa drone shutdown (19 Nov) · Han Duck-soo verdict (19 Nov) · Somalia expels UAE envoy (19 Nov)",
+           font=font(SANS, 9), fill=MUTED)
+    d.text((M + 10, by0 + 36),
+           "Senate Iran vote (19 Nov) · Anthropic debut (19 Nov) · Fiji drought (19 Nov) · COP31 draft (19 Nov) · IRGC tanker claim (4 Nov)",
+           font=font(SANS, 9), fill=MUTED)
     # ---- footer ----
-    d.text((M, 1006), "Sources: Reuters · BBC · AP · AFP · NYT · IMD · UN · IUCN · The Hindu · Daily Baku · The Germany Eye · The Paris Eye",
-           font=font(SANS, 11), fill=MUTED)
-    d.text((X1 - d.textlength("Original drawings.", font=font(SANS, 11)), 1006),
-           "Original drawings.", font=font(SANS, 11), fill=MUTED)
+    d.text((M, 1012), "Sources: Reuters · AP · AFP · BBC · UNICEF · UNRWA · IMD · Yonhap · France 24 · Euronews · ABC · CoinDesk · Mail & Guardian",
+           font=font(SANS, 10), fill=MUTED)
+    d.text((X1 - d.textlength("Original drawings. Claims attributed, not stated as fact.", font=font(SANS, 10)), 1012),
+           "Original drawings. Claims attributed, not stated as fact.", font=font(SANS, 10), fill=MUTED)
+
+    total = len(HEROES) + len(SECONDARY) + len(LISTED)
+    rsum = sum(n for _, n, _ in REGIONS)
+    print(f"counts: heroes {len(HEROES)} + secondary {len(SECONDARY)} + listed {len(LISTED)} = {total}; regions sum {rsum}")
+    assert total == 35 and rsum == 35, "counts do not reconcile to 35"
 
     img.save("entry.png", optimize=True)
     print("saved entry.png", img.size, "bytes:", os.path.getsize("entry.png"))
