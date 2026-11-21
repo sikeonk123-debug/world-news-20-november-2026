@@ -14,6 +14,24 @@ Finland Onkalo licence, the IRGC "four tankers" claim and the Pete Rose
 pardon were all 19 Nov or earlier and are excluded; COP31 did NOT close
 with a deal on 20 Nov (overtime); the Hormuz mine story is Iran's claim
 only. Drawn with Pillow only; no photos, no copied art.
+
+v4 (21 Nov 2026): three fixes vs v3, everything else identical.
+(1) Numbers strip rewritten as two rows of three, each number now a
+complete mini-story; the bare "175* Nicholls" and "$3.79bn GTA VI"
+are gone. (2) Hero 3 is now Asia's AI sell-off, carrying a data table
+(Taipei -6.2%, Seoul -5.2%, Tokyo -5.1%, Hong Kong -1.9% — all from
+the same AP report); COP31 moves down to secondary slot 6.
+(3) Secondary slots 8 and 13 are now hard world news: Kenya drills
+its first oil well (Amosing spudded in Turkana on Friday 20 Nov,
+Energy CS Wandayi presiding; first oil 1 Dec, 20,000 bpd — reported
+by Capital FM, Business Daily Africa, The Star, KBC and People Daily;
+no Reuters/AP/AFP/BBC/Al Jazeera wire found, so the card cites
+Capital FM) and Italy's general strike (CGIL, Reuters "ROME, Nov 20";
+marches in 100+ cities). GTA VI sales and the Anthropic IPO are gone
+from the page entirely. Bukele's third-term filing was 19 Nov
+(Reuters dateline Nov 19), so it is NOT a story — it joins the DATE
+CHECK exclusions instead (now 14). Regions now EUROPE 9, AMERICAS 8, ASIA 4,
+MIDDLE EAST 4, WORLD 4, AFRICA 4, OCEANIA 2 = 35.
 """
 from PIL import Image, ImageDraw, ImageFont
 import os
@@ -256,15 +274,59 @@ def ill_gaza(d, box):
     for i, c in enumerate([(190, 150, 90), (150, 120, 80)]):
         d.rectangle([x1 - 44 + i * 4, ty - 16 - i * 12, x1 - 22 + i * 4, ty - 2 - i * 12], fill=c)
 
-def ill_gta(d, box):
+def ill_aiselloff(d, box):
+    """Hero 3: a visible data table of Friday's Asian index falls."""
     x0, y0, x1, y1 = box
-    bands(d, box, [(255, 166, 88), (255, 120, 130), (150, 80, 160), (90, 60, 140)])
-    sun(d, (x0 + x1) // 2, y0 + 44, 20, (255, 236, 170))
-    for bx, bw, bh in [(x0 + 8, 26, 34), (x0 + 40, 20, 46), (x0 + 128, 24, 40), (x0 + 156, 18, 52)]:
-        d.rectangle([bx, y1 - bh, bx + bw, y1], fill=(40, 26, 66))
-    palm(d, x0 + 78, y1, 34, (30, 18, 52))
-    palm(d, x0 + 112, y1, 26, (30, 18, 52))
-    d.rectangle([x0, y1 - 6, x1, y1], fill=(30, 18, 52))
+    bands(d, box, [(248, 240, 228), (244, 232, 214), (238, 224, 200)])
+    rows = [("TAIPEI", "-6.2%", 6.2), ("SEOUL", "-5.2%", 5.2),
+            ("TOKYO", "-5.1%", 5.1), ("HONG KONG", "-1.9%", 1.9)]
+    for i, (name, val, v) in enumerate(rows):
+        ry = y0 + 12 + i * 24
+        d.text((x0 + 12, ry), name, font=font(SANS_B, 12), fill=INK)
+        bw = int(120 * v / 6.2)
+        d.rectangle([x0 + 118, ry + 2, x0 + 118 + bw, ry + 12], fill=(178, 34, 34))
+        d.text((x0 + 118 + bw + 8, ry), val, font=font(SANS_B, 12), fill=(178, 34, 34))
+    d.text((x0 + 12, y1 - 16), "index moves, Friday's close", font=font(SANS, 9), fill=MUTED)
+
+def ill_oilrig(d, box):
+    """Kenya: an oil derrick on the Turkana savanna."""
+    x0, y0, x1, y1 = box
+    bands(d, box, [(232, 196, 140), (226, 178, 118), (214, 158, 96)])
+    sun(d, x0 + 26, y0 + 16, 10, (255, 214, 90))
+    d.rectangle([x0, y1 - 10, x1, y1], fill=(96, 66, 40))
+    for tx in (x0 + 8, x0 + 30):
+        d.rectangle([tx, y1 - 26, tx + 18, y1 - 10], fill=(70, 74, 80))
+        d.ellipse([tx + 2, y1 - 30, tx + 16, y1 - 24], fill=(70, 74, 80))
+    bx, top = y1 - 10, y0 + 8
+    cx = (x0 + x1) // 2 + 24
+    d.line([cx - 26, bx, cx, top], fill=(40, 30, 20), width=3)
+    d.line([cx + 26, bx, cx, top], fill=(40, 30, 20), width=3)
+    for fy in (bx - 12, bx - 24, bx - 36):
+        t = (bx - fy) / (bx - top)
+        hw = 26 * (1 - t)
+        d.line([cx - hw, fy, cx + hw, fy], fill=(40, 30, 20), width=2)
+    d.rectangle([cx - 30, bx - 4, cx + 30, bx], fill=(40, 30, 20))
+
+def ill_strike(d, box):
+    """Italy: a strike crowd with placards and the tricolour."""
+    x0, y0, x1, y1 = box
+    bands(d, box, [(196, 210, 222), (178, 194, 210), (160, 178, 198)])
+    fx, fy = x1 - 34, y0 + 8
+    d.line([fx, fy, fx, fy + 22], fill=(60, 60, 60), width=2)
+    for i, c in enumerate([(0, 146, 70), (255, 255, 255), (205, 33, 42)]):
+        d.rectangle([fx + 1 + i * 7, fy, fx + 8 + i * 7, fy + 11], fill=c)
+    for px in (x0 + 44, x0 + 108):
+        d.line([px, y0 + 26, px, y0 + 44], fill=(60, 60, 60), width=2)
+        d.rectangle([px - 9, y0 + 14, px + 9, y0 + 26], fill=(255, 255, 255),
+                    outline=(60, 60, 60), width=1)
+        d.line([px - 9, y0 + 20, px + 9, y0 + 20], fill=(178, 34, 34), width=2)
+    cols = [(178, 34, 34), (24, 34, 52), (60, 140, 90), (220, 160, 40),
+            (120, 60, 140), (30, 90, 160), (200, 90, 60)]
+    for i, c in enumerate(cols):
+        hx = x0 + 16 + i * 22
+        d.ellipse([hx - 5, y1 - 26, hx + 5, y1 - 16], fill=(232, 190, 160))
+        d.rectangle([hx - 7, y1 - 16, hx + 7, y1 - 8], fill=c)
+    d.rectangle([x0, y1 - 8, x1, y1], fill=(110, 110, 108))
 
 def ill_cricket(d, box):
     x0, y0, x1, y1 = box
@@ -305,21 +367,10 @@ def ill_border(d, box):
     d.rectangle([x0 + 62, y0 + 8, x0 + 118, y0 + 20], fill=(24, 34, 52))
     d.text((x0 + 67, y0 + 10), "CLOSED", font=font(SANS_B, 10), fill=(255, 255, 255))
 
-def ill_exchange(d, box):
-    x0, y0, x1, y1 = box
-    bands(d, box, [(38, 48, 78), (48, 62, 98), (62, 78, 118)])
-    d.rectangle([x0 + 52, y1 - 52, x0 + 128, y1 - 12], fill=(210, 208, 200))
-    d.polygon([(x0 + 44, y1 - 52), (x0 + 90, y1 - 74), (x0 + 136, y1 - 52)], fill=(170, 168, 158))
-    for wx in range(x0 + 60, x0 + 122, 14):
-        d.rectangle([wx, y1 - 44, wx + 7, y1 - 30], fill=(255, 214, 90))
-    d.rectangle([x0 + 84, y1 - 26, x0 + 96, y1 - 12], fill=(90, 86, 78))
-    d.line([x1 - 52, y0 + 16, x1 - 30, y0 + 34, x1 - 44, y0 + 52], fill=(255, 90, 80), width=3)
-    d.polygon([(x1 - 44, y0 + 44), (x1 - 44, y0 + 56), (x1 - 32, y0 + 52)], fill=(255, 90, 80))
-
 ILLS = {
-    1: ill_akvan, 2: ill_kyiv, 3: ill_cop31, 4: ill_genoa, 5: ill_tanker,
-    6: ill_nvidia, 7: ill_chart, 8: ill_gta, 9: ill_talks, 10: ill_cricket,
-    11: ill_border, 12: ill_lebanon, 13: ill_exchange,
+    1: ill_akvan, 2: ill_kyiv, 3: ill_aiselloff, 4: ill_genoa, 5: ill_tanker,
+    6: ill_cop31, 7: ill_chart, 8: ill_oilrig, 9: ill_talks, 10: ill_cricket,
+    11: ill_border, 12: ill_lebanon, 13: ill_strike,
 }
 
 # ---------- story data ----------
@@ -331,9 +382,9 @@ HEROES = [
     (2, "EUROPE", "UKRAINE WAR", "REUTERS",
      "Russia hits Kyiv's bridges",
      "400+ drones and 110 missiles hit three Dnipro bridges overnight; 8 killed."),
-    (3, "WORLD", "CLIMATE", "REUTERS",
-     "COP31 misses its deadline",
-     "Antalya talks go into overtime; draft drops fossil fuels and $120bn target."),
+    (3, "ASIA", "MARKETS", "REUTERS",
+     "Asia's AI sell-off deepens",
+     "Friday's tech rout hits Taipei, Seoul, Tokyo and Hong Kong."),
 ]
 SECONDARY = [
     (4, "EUROPE", "POLAND", "AP",
@@ -342,15 +393,15 @@ SECONDARY = [
     (5, "MIDDLE EAST", "GULF", "REUTERS",
      "Tanker ablaze off Hormuz",
      "UKMTO: projectile hits tanker; Iran mine claim unverified."),
-    (6, "ASIA", "MARKETS", "REUTERS",
-     "Asia's AI sell-off deepens",
-     "Nikkei -5.1%, Kospi -5.2%, Taiex -6.2% in tech rout."),
+    (6, "WORLD", "CLIMATE", "REUTERS",
+     "COP31 misses deadline",
+     "Draft drops fossil fuels and $120bn target."),
     (7, "AMERICAS", "MARKETS", "AP",
      "Wall Street plunges",
      "S&P -3.7%, Nasdaq -5.3%; worst week in 18 months."),
-    (8, "WORLD", "GAMES", "REUTERS",
-     "GTA VI: $3.79bn day one",
-     "Record sales announced; 32.5m copies pre-sold."),
+    (8, "AFRICA", "ENERGY", "CAPITAL FM",
+     "Kenya's first oil well",
+     "Amosing spudded in Turkana; first oil due 1 Dec, 20,000 bpd."),
     (9, "EUROPE", "BREXIT", "REUTERS",
      "UK-EU seal reset deal",
      "Food trade, carbon link, youth mobility agreed."),
@@ -363,9 +414,9 @@ SECONDARY = [
     (12, "MIDDLE EAST", "LEBANON", "AP",
      "Israel strikes Lebanon again",
      "Artillery and five air strikes hit south and Bekaa."),
-    (13, "AMERICAS", "TECH", "AFP",
-     "Anthropic slides on day two",
-     "Shares fall ~9% after debut; IPO totals $93.5bn."),
+    (13, "EUROPE", "STRIKE", "REUTERS",
+     "Italy's general strike",
+     "CGIL stages a full-day strike; marches in 100+ cities."),
 ]
 LISTED = [
     "Seoul: 111 caught cheating at Suneung exam",
@@ -391,18 +442,22 @@ LISTED = [
     "Washington: Trump threatens data-centre penalties",
     "Antalya: 20 nations push back on draft",
 ]
-REGIONS = [("EUROPE", 8, (36, 84, 160)), ("AMERICAS", 9, (14, 128, 128)),
+REGIONS = [("EUROPE", 9, (36, 84, 160)), ("AMERICAS", 8, (14, 128, 128)),
            ("ASIA", 4, (122, 62, 158)), ("MIDDLE EAST", 4, (178, 44, 44)),
-           ("WORLD", 5, (96, 96, 100)), ("AFRICA", 3, (46, 134, 74)),
+           ("WORLD", 4, (96, 96, 100)), ("AFRICA", 4, (46, 134, 74)),
            ("OCEANIA", 2, (214, 122, 26))]
-NUMBERS = [("372,000", "evacuated"), ("400+", "drones"),
-           ("$3.79bn", "GTA VI"), ("100,000", "youth"),
-           ("1,144", "children"), ("175*", "Nicholls")]
+# numbers strip, two rows of three: each number tells a complete mini-story
+NUMBERS_ROW1 = [("372,000", "evacuated before Akvan landfall"),
+                ("400+", "drones fired at Kyiv"),
+                ("-6.2%", "Taiwan index, Friday's close")]
+NUMBERS_ROW2 = [("100,000", "youth visas a year in UK-EU deal"),
+                ("1,144", "children killed or hurt in Ukraine, 2026"),
+                ("94%", "of Gazans urgently need shelter")]
 # map pins: (num, x, y) in map coords; red for 1-3, navy for 4-13
-PINS = [(1, 240, 846), (2, 196, 807), (3, 192, 822), (4, 184, 796),
-        (5, 217, 838), (6, 292, 812), (7, 71, 823), (8, 106, 838),
-        (9, 182, 818), (10, 312, 925), (11, 202, 786), (12, 206, 830),
-        (13, 58, 832)]
+PINS = [(1, 240, 846), (2, 196, 807), (3, 292, 812), (4, 184, 796),
+        (5, 217, 838), (6, 196, 824), (7, 71, 823), (8, 240, 868),
+        (9, 178, 810), (10, 312, 925), (11, 202, 786), (12, 206, 830),
+        (13, 188, 814)]
 LAND = [  # ellipses (x0, y0, x1, y1) forming a coarse dotted world map
     (45, 775, 170, 850), (175, 772, 200, 790), (130, 855, 185, 935),
     (185, 790, 235, 825), (190, 830, 250, 920), (235, 780, 310, 850),
@@ -464,22 +519,32 @@ def main():
             d.text((x + (w - d.textlength(str(n), font=f2)) / 2, y0 + 13), str(n), font=f2, fill=(255, 255, 255))
         x += w
 
-    # ---- numbers strip ----
+    # ---- numbers strip: two rows of three, each number a full mini-story ----
     y = 182
     d.text((M, y), "THE DAY IN NUMBERS:", font=font(SANS_B, 14), fill=INK)
     nx = M + d.textlength("THE DAY IN NUMBERS:  ", font=font(SANS_B, 14))
-    for num, lab in NUMBERS:
+    for num, lab in NUMBERS_ROW1:
         f1, f2 = font(SANS_B, 14), font(SANS, 13)
         d.text((nx, y), num, font=f1, fill=RED)
         nx += d.textlength(num + " ", font=f1)
         d.text((nx, y), lab, font=f2, fill=INK)
         nx += d.textlength(lab + "  ·  ", font=f2)
     if nx > X1:
-        print(f"OVERFLOW: numbers strip ends at {nx}, page edge {X1}")
-    d.line([M, 206, X1, 206], fill=RULE, width=1)
+        print(f"OVERFLOW: numbers strip row 1 ends at {nx}, page edge {X1}")
+    nx = M
+    y2 = y + 17
+    for num, lab in NUMBERS_ROW2:
+        f1, f2 = font(SANS_B, 14), font(SANS, 13)
+        d.text((nx, y2), num, font=f1, fill=RED)
+        nx += d.textlength(num + " ", font=f1)
+        d.text((nx, y2), lab, font=f2, fill=INK)
+        nx += d.textlength(lab + "  ·  ", font=f2)
+    if nx > X1:
+        print(f"OVERFLOW: numbers strip row 2 ends at {nx}, page edge {X1}")
+    d.line([M, 210, X1, 210], fill=RULE, width=1)
 
     # ---- hero stories ----
-    hy, hh = 214, 234
+    hy, hh = 216, 232
     hw, gap = 312, 20
     for i, (num, region, topic, src, head, summ) in enumerate(HEROES):
         x = M + i * (hw + gap)
@@ -553,10 +618,10 @@ def main():
            "Nvidia subpoena (19 Nov) · Genoa drone shutdown (19 Nov) · Han Duck-soo verdict (19 Nov) · Somalia expels UAE envoy (19 Nov)",
            font=font(SANS, 9), fill=MUTED)
     d.text((M + 10, by0 + 36),
-           "Senate Iran vote (19 Nov) · Anthropic debut (19 Nov) · Fiji drought (19 Nov) · COP31 draft (19 Nov) · IRGC tanker claim (4 Nov)",
+           "Senate Iran vote (19 Nov) · Finland Onkalo licence (19 Nov) · Fiji drought (19 Nov) · COP31 draft (19 Nov) · IRGC tanker claim (4 Nov) · Bukele files for third term (19 Nov)",
            font=font(SANS, 9), fill=MUTED)
     # ---- footer ----
-    d.text((M, 1012), "Sources: Reuters · AP · AFP · BBC · UNICEF · UNRWA · IMD · Yonhap · France 24 · Euronews · ABC · CoinDesk · Mail & Guardian",
+    d.text((M, 1012), "Sources: Reuters · AP · AFP · BBC · UNICEF · UNRWA · IMD · Yonhap · France 24 · Euronews · ABC · CoinDesk · Mail & Guardian · Capital FM",
            font=font(SANS, 10), fill=MUTED)
     d.text((X1 - d.textlength("Original drawings. Claims attributed, not stated as fact.", font=font(SANS, 10)), 1012),
            "Original drawings. Claims attributed, not stated as fact.", font=font(SANS, 10), fill=MUTED)
